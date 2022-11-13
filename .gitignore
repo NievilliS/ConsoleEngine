@@ -5,6 +5,7 @@ cmake-build*
 90_BUILD/* 
 .txt
 ConsoleEngine
+test*
 
 # Prerequisites 
 *.d 

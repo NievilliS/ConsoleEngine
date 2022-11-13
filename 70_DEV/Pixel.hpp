@@ -1,3 +1,31 @@
+/**
+ * @file Pixel.hpp
+ * @author David Schoosleitner (nievillis@github.com)
+ * @brief Contains definitions of pixel character and pixel string
+ * @version 0.1
+ * @date 2022-11-13
+ * 
+ * @copyright Copyright (c) 2022 David Schoosleitner
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 #pragma once
 
 #define ANSI_DEFAULT_STREAM std::cout
@@ -6,6 +34,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <functional>
 
 //! Bit Structure FFFO OOOT CCCC CCCC 
 typedef __UINT16_TYPE__ Pixel_t;
@@ -54,7 +83,7 @@ namespace Pixel
         ALL = 7uc
     };
 
-    typedef void (*pixel_lambda)(const size_t index, char &character, ColorType &color_type, Color &color, Font &font); 
+    typedef const std::function<void(const size_t, char &, ColorType &, Color &, Font &)> pixel_lambda; 
 
     inline static const Color int_to_color(const __UINT8_TYPE__ val)
     {
@@ -207,7 +236,7 @@ namespace Pixel
         pixel = (font << 13) | (pixel & 0x1FFFus);
     }
 
-    std::string to_string(const Pixel_t &pixel)
+    inline static std::string to_string(const Pixel_t &pixel)
     {
         std::string ret = "";
         static Color old_color = DEFAULT;
@@ -303,7 +332,7 @@ namespace Pixel
         return i;
     }
 
-    std::string to_string(const Pixel_t *pixels)
+    inline static std::string to_string(const Pixel_t *pixels)
     {
         std::string ret = "";
         const size_t max = get_pixel_string_length(pixels);
@@ -314,7 +343,7 @@ namespace Pixel
         return ret;
     }
 
-    std::string to_string(const pixelstr ps)
+    inline static std::string to_string(const pixelstr ps)
     {
         return to_string(ps.c_str());
     }
@@ -414,6 +443,22 @@ namespace Pixel
         }
     }
 
+    inline static void copy_string_to_pixel_string_par(pixelstr &pixel_dest, const std::string str_source, pixel_lambda lambda_function)
+    {
+        pixel_dest.clear();
+        const size_t size = str_source.size();
+        #pragma omp parallel for
+        for(size_t i = 0; i < size; i++)
+        {
+            char character = str_source.at(i);
+            ColorType color_type = TEXT;
+            Color color = DEFAULT;
+            Font font = NORMAL;
+            lambda_function(i, character, color_type, color, font);
+            pixel_dest += Pixel::create_pixel(character, color_type, color, font);
+        }
+    }
+
     inline static void for_each(pixelstr &pixel_dest, pixel_lambda lambda_function)
     {
         size_t i = 0;
@@ -461,12 +506,12 @@ namespace Pixel
     }
 };
 
-std::ostream &operator<<(std::ostream &o, pixelstr ps)
+inline static std::ostream &operator<<(std::ostream &o, pixelstr ps)
 {
     return o << Pixel::to_string(ps);
 }
 
-pixelstr operator "" ps(const char *c, size_t size)
+inline static pixelstr operator "" ps(const char *c, size_t size)
 {
     pixelstr ps;
     for(size_t i = 0ULL; i < size; i++)
