@@ -85,3 +85,10 @@ run: default
 rundebug: debug
 	$(GDB) $(OUTPUT_FILE)_gdb
 
+# Custom
+INCL_FILES := ANSICONSTANTS ConsoleEngine.hpp Pixel.hpp
+TARGET_INCL_DIR := /usr/include/consoleengine
+install: clean default $(INCL_FILES)
+
+$(INCL_FILES):
+	sudo cp $(SOURCE_DIR)/$@ $(TARGET_INCL_DIR)/$@
