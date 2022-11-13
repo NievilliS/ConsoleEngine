@@ -31,7 +31,7 @@ CCFLAGS := -Wno-literal-suffix
 ### SOURCE/OBJ DEFINITIONS ###
 
 # Source Files, You may edit these to include files! 
-SOURCES := test.cpp test2.cpp
+SOURCES := dummy.cpp
 
 # Check if sources not empty
 ifeq ($(SOURCES),)
