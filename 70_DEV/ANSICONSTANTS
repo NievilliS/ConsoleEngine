@@ -25,13 +25,14 @@
 #define ERASE_N_LINES(n)                CSI #n "M"
 #define ERASE_N_CHARS(n)                CSI #n "P"
 #define SAVE_CURSOR_POS                 CSI "s"
-#define GOTO_SAVED_CURSOR_POS           CSI "u"
+#define RESTORE_SAVED_CURSOR_POS        CSI "u"
 
 #define COLOR_RESET                     CSI "0m"
 #define COLOR_FONT_BOLD                 CSI "1m"
 #define COLOR_FONT_UNDERLINED           CSI "4m"
 #define COLOR_FONT_INVERSE              CSI "7m"
 #define COLOR_FONT_RESET                CSI "22m"
+#define COLOR_FONT_NOT_BOLD             CSI "21m"
 #define COLOR_FONT_NOT_UNDERLINED       CSI "24m"
 #define COLOR_FONT_NOT_INVERSE          CSI "27m"
 

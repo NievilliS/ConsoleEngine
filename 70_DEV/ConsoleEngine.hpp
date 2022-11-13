@@ -13,4 +13,4 @@ protected:
     int m_cursory;
     int m_startx;
     int m_starty;
-}
+};
